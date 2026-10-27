@@ -8,7 +8,7 @@ client = discord.Client(intents=intents)
 
 # ★コピーした実際のID
 ZUNDAMON_ID = 917633605684056085
-ANNOUNCE_CHANNEL_ID = 1486792534800859259
+ANNOUNCE_CHANNEL_ID = 1564663821161865267
 
 @client.event
 async def on_ready():
