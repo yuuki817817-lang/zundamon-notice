@@ -27,7 +27,7 @@ async def on_voice_state_update(member, before, after):
         return
 
     # 今イベントが起きたサーバー（ギルド）を特定する
-    guild = after.guild if after.guild else before.guild
+　　　guild = member.guild
     if guild.id not in SERVER_CHANNEL_MAP:
         return
 
