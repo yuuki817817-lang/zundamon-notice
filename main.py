@@ -2,7 +2,7 @@ import os
 import discord
 
 intents = discord.Intents.default()
-intents.voice_states = True 
+intents.voice_states = True
 
 client = discord.Client(intents=intents)
 
@@ -20,6 +20,9 @@ async def on_ready():
 
 @client.event
 async def on_voice_state_update(member, before, after):
+    # デバッグ用のログ（Discordの動きをキャッチできているか確認用）
+    print(f"【デバッグ】音声の動きを検知しました！ メンバーID: {member.id}")
+
     if member.id != ZUNDAMON_ID:
         return
 
@@ -41,10 +44,8 @@ async def on_voice_state_update(member, before, after):
     elif before.channel is not None and after.channel is None:
         await channel.send(f"🟢 **【空き】** ずんだもんが退室したのだ！使っても大丈夫なのだ！")
 
-import os
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
-import discord
 
 class DummyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
