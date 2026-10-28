@@ -6,39 +6,46 @@ intents.voice_states = True
 
 client = discord.Client(intents=intents)
 
-# ★コピーした実際のID
 ZUNDAMON_ID = 917633605684056085
-ANNOUNCE_CHANNEL_ID_LIST = [
-1564663821161865267,
-1564676976630046911,
-]
+
+# サーバーIDと、そのサーバー用の通知チャンネルIDを紐付ける辞書
+SERVER_CHANNEL_MAP = {
+    1486792533404291084: 1564663821161865267,  # 1つ目のサーバー
+    1545825944797843496: 1564676976630046911,  # 2つ目のサーバー
+}
 
 @client.event
 async def on_ready():
-    print(f'通知Bot（{client.user}）が正常に起動したのだ！')
+    print(f'通知Bot ({client.user}) が正常に起動したのだ！')
 
 @client.event
 async def on_voice_state_update(member, before, after):
     if member.id != ZUNDAMON_ID:
         return
 
-for channel_id in ANNOUNCE_CHANNEL_ID_LIST:
-        channel = client.get_channel(channel_id)
-        if channel is None:
-            continue
+    # 今イベントが起きたサーバー（ギルド）を特定する
+    guild = after.guild if after.guild else before.guild
+    if guild.id not in SERVER_CHANNEL_MAP:
+        return
 
-        if before.channel != after.channel and after.channel is not None:
-            await channel.send(f"🔴 **【使用中】** ずんだもんが **{after.channel.name}** に入室したのだ！")
+    # そのサーバー専用のチャンネルIDを取り出す
+    channel_id = SERVER_CHANNEL_MAP[guild.id]
+    channel = client.get_channel(channel_id)
+    if channel is None:
+        return
 
-        elif before.channel is not None and after.channel is None:
-            await channel.send(f"🟢 **【空き】** ずんだもんが退室したのだ！使っても大丈夫なのだ！")
+    # それぞれのサーバー専用のチャンネルに通知を送る
+    if before.channel != after.channel and after.channel is not None:
+        await channel.send(f"🔴 **【使用中】** ずんだもんが **{after.channel.name}** に入室したのだ！")
+
+    elif before.channel is not None and after.channel is None:
+        await channel.send(f"🟢 **【空き】** ずんだもんが退室したのだ！使っても大丈夫なのだ！")
 
 import os
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import discord
 
-# --- 以下を追加 ---
 class DummyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -51,7 +58,5 @@ def run_dummy_server():
     server.serve_forever()
 
 threading.Thread(target=run_dummy_server, daemon=True).start()
-# ------------------
 
-# (※ここから下は既存の client.run です)
 client.run(os.environ['DISCORD_TOKEN'])
